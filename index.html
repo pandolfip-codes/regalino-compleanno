@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Un regalo per Gemma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=Marcellus&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{min-height:100dvh;color:#4a544e;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
+  background:radial-gradient(140% 70% at 50% 8%, #eef4ef 0%, #f7f2e8 44%, #f4efe4 100%)}
+canvas#confetti{position:fixed;inset:0;z-index:60;pointer-events:none}
+
+/* ---- sfondo floreale ---- */
+.floral{position:fixed;z-index:0;pointer-events:none}
+.floral.tl{top:0;left:0;width:62vw;max-width:330px}
+.floral.br{bottom:0;right:0;width:70vw;max-width:360px}
+.veil{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:radial-gradient(60% 42% at 50% 44%, rgba(247,242,232,.7), transparent 72%)}
+
+/* ============ SCENA 1 ============ */
+.stage{position:relative;z-index:2;min-height:100dvh;display:grid;place-items:center;padding:32px 24px 74px}
+.card{width:100%;max-width:430px;text-align:center;animation:fade .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.title{font-family:"Pinyon Script",cursive;font-weight:400;font-size:clamp(50px,16vw,74px);line-height:1.04;color:#5b7d75}
+.name{display:block;font-family:"Pinyon Script",cursive;font-weight:400;
+  font-size:clamp(50px,16vw,74px);line-height:1.02;color:#4a544e;margin-top:12px}
+.sub{font-family:"Cormorant Garamond",serif;font-size:20px;line-height:1.55;color:#6f7d76;max-width:34ch;margin:16px auto 0}
+.sprig{margin:16px auto 4px;display:block;width:112px;color:#a9bca1}
+
+.gift{--box:#dfe9e2;--lid:#c3d0be;--ribbon:#9fb8ad;position:relative;width:128px;height:128px;margin:8px auto 0;cursor:pointer;animation:bob 4s ease-in-out infinite}
+.gift .glow{position:absolute;inset:-38%;border-radius:50%;background:radial-gradient(circle,rgba(168,208,203,.5),transparent 62%);z-index:-1;opacity:.7;transition:opacity .5s}
+.gift .box{position:absolute;top:40px;left:0;right:0;bottom:0;border-radius:8px;background:var(--box);box-shadow:inset 0 2px 0 rgba(255,255,255,.5),0 14px 22px rgba(90,110,100,.16)}
+.gift .rib-v{position:absolute;top:40px;bottom:0;left:50%;width:13px;transform:translateX(-50%);background:var(--ribbon);opacity:.9}
+.gift .lid{position:absolute;top:24px;left:-8px;right:-8px;height:30px;border-radius:7px;background:var(--lid);box-shadow:0 4px 8px rgba(90,110,100,.14);transform-origin:center bottom;transition:transform .5s cubic-bezier(.5,-.4,.3,1.4),opacity .55s}
+.gift .lid-rib{position:absolute;top:24px;height:30px;left:50%;width:13px;transform:translateX(-50%);background:var(--ribbon);transition:transform .5s,opacity .5s}
+.gift .bow{position:absolute;top:5px;left:50%;transform:translateX(-50%);width:58px;height:34px;transition:transform .5s,opacity .45s}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+.opening .gift{animation:none}
+.opening .lid{transform:translateY(-64px) rotate(-12deg);opacity:0}
+.opening .lid-rib{transform:translate(-50%,-64px);opacity:0}
+.opening .bow{transform:translate(-50%,-46px) scale(.6);opacity:0}
+.opening .glow{opacity:1}
+
+.btn{margin-top:24px;cursor:pointer;border:none;font-family:"Cormorant Garamond",serif;font-size:20px;letter-spacing:.05em;color:#3f4a44;
+  background:linear-gradient(180deg,#cdddd4,#b4cabf);border-radius:999px;padding:15px 34px;
+  box-shadow:0 10px 22px rgba(159,184,173,.42);transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible{outline:2px solid #7a9089;outline-offset:4px}
+
+/* ============ SCENA 2 · BIGLIETTI ============ */
+.tickets{display:none;position:relative;z-index:2;min-height:100dvh;padding:44px 20px 56px;flex-direction:column;align-items:center;gap:16px}
+.tickets.show{display:flex}
+.t-head{text-align:center;opacity:0;transform:translateY(12px);animation:fade .7s .05s forwards;margin-bottom:8px}
+.t-head .t-only{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:clamp(15px,4.8vw,21px);line-height:1.4;color:#6f7d76;white-space:nowrap;margin:0 auto}
+
+.pass{--paper:#f6f1e6;--paper-line:#d9cfb8;--night-2:#161d4a;--gold:#e9b44c;--gold-soft:#f4d38a;--ink:#20232e;--ink-soft:#6d6a5c;
+  width:100%;max-width:420px;display:flex;background:var(--paper);color:var(--ink);border-radius:16px;overflow:hidden;text-align:left;
+  font-family:"IBM Plex Mono",monospace;position:relative;box-shadow:0 20px 40px rgba(11,16,48,.3);
+  opacity:0;transform:translateY(26px) scale(.97)}
+.pass.in{animation:passIn .7s cubic-bezier(.2,.8,.2,1) forwards}
+.pass.static{opacity:1;transform:none}
+.pass.static .path .plane-ico{left:calc(100% - 4px)}
+@keyframes passIn{to{opacity:1;transform:none}}
+
+.pass .main{flex:1;min-width:0;padding:16px 16px 14px}
+.pass .toprow{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.pass .airline{display:flex;align-items:center;gap:8px;font-weight:600;font-size:12px;letter-spacing:.04em;color:var(--ink)}
+.pass .airline .plane{width:22px;height:22px;border-radius:6px;background:var(--night-2);color:var(--gold);display:grid;place-items:center;font-size:12px}
+.pass .kind{font-size:9px;letter-spacing:.26em;color:var(--ink-soft);text-transform:uppercase}
+.p-tag{display:inline-block;font-weight:600;font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#3a2f12;background:var(--gold-soft);border-radius:4px;padding:3px 11px;margin-bottom:14px}
+
+.route{display:flex;align-items:center;justify-content:space-between;gap:6px;margin:2px 0 16px}
+.route .leg{text-align:center}.route .leg.arr{text-align:right}
+.code{font-family:"Fraunces",serif;font-weight:600;font-size:clamp(30px,9vw,40px);line-height:1;letter-spacing:.02em;color:var(--ink)}
+.city{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:5px}
+.leg.arr .city{opacity:0;transition:opacity .45s ease}
+.leg.arr .city.show{opacity:1}
+.path{flex:1;position:relative;height:26px;margin-top:-6px}
+.path .line{position:absolute;top:50%;left:2px;right:14px;border-top:2px dashed var(--paper-line)}
+.path .plane-ico{position:absolute;top:50%;left:0;transform:translate(-50%,-52%);font-size:16px;color:var(--night-2)}
+.pass.in .path .plane-ico{animation:fly 2.4s ease-in-out .6s forwards}
+@keyframes fly{to{left:calc(100% - 4px)}}
+
+.fields{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px 10px}
+.f.wide{grid-column:1 / -1}
+.f .lbl{font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+.f .val{font-size:14px;font-weight:600;margin-top:3px;letter-spacing:.01em;color:var(--ink)}
+.f .val.big{font-size:16px}
+
+.pass .stub{width:82px;flex-shrink:0;background:var(--night-2);color:var(--paper);padding:14px 10px;display:flex;flex-direction:column;justify-content:space-between;align-items:center;position:relative}
+.pass .stub::before{content:"";position:absolute;left:-7px;top:0;bottom:0;width:14px;
+  background:radial-gradient(circle at 0 6px, transparent 0 6px, var(--paper) 6px) 0 0/14px 22px repeat-y}
+.stub .s-code{font-family:"Fraunces",serif;font-size:20px;font-weight:600;color:var(--gold-soft);writing-mode:vertical-rl;transform:rotate(180deg);letter-spacing:.1em}
+.stub .barcode{width:100%;height:44px;background:repeating-linear-gradient(90deg,var(--paper) 0 2px,transparent 2px 3px,var(--paper) 3px 4px,transparent 4px 7px)}
+.stub .seat{font-size:11px;letter-spacing:.1em;color:rgba(246,241,230,.7)}
+
+.foot{font-family:"Pinyon Script",cursive;font-size:34px;color:#5b7d75;text-align:center;margin-top:6px;opacity:0;animation:fade .7s .7s forwards}
+.foot .fsprig{display:block;width:96px;margin:2px auto 0;color:#a9bca1}
+
+@media (prefers-reduced-motion: reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}.pass{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<!-- definizioni floreali -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="wc" x="-45%" y="-45%" width="190%" height="190%"><feGaussianBlur stdDeviation="2.1"/></filter>
+  <symbol id="bloom" overflow="visible">
+    <g filter="url(#wc)" fill="currentColor" fill-opacity="0.6">
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z"/>
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z" transform="rotate(60)"/>
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z" transform="rotate(120)"/>
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z" transform="rotate(180)"/>
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z" transform="rotate(240)"/>
+      <path d="M0 0C-8-15-8-33 0-44 8-33 8-15 0 0Z" transform="rotate(300)"/>
+    </g>
+    <circle r="8" fill="#f4ecdc" fill-opacity="0.85" filter="url(#wc)"/>
+  </symbol>
+  <symbol id="leaf" overflow="visible">
+    <path d="M0 22C-9 6-9-12 0-24 9-12 9 6 0 22Z" fill="currentColor" fill-opacity=".5" filter="url(#wc)"/>
+  </symbol>
+</defs></svg>
+
+<svg class="floral tl" viewBox="0 0 300 280" aria-hidden="true">
+  <g style="color:#a9bca1">
+    <use href="#leaf" transform="translate(120 150) rotate(35) scale(1.15)"/>
+    <use href="#leaf" transform="translate(150 120) rotate(70) scale(1)"/>
+    <use href="#leaf" transform="translate(90 175) rotate(20) scale(.9)"/>
+    <use href="#leaf" transform="translate(175 165) rotate(95) scale(1.05)"/>
+  </g>
+  <g style="color:#b6d2cb"><use href="#leaf" transform="translate(60 120) rotate(-15) scale(1.1)"/></g>
+  <use href="#bloom" transform="translate(52 50) scale(1.4) rotate(12)" style="color:#e7c7bf"/>
+  <use href="#bloom" transform="translate(126 104) scale(1.02) rotate(-18)" style="color:#aed3cc"/>
+  <use href="#bloom" transform="translate(30 128) scale(.66) rotate(28)" style="color:#eed6ce"/>
+  <circle cx="150" cy="70" r="4" fill="#c9a96a" opacity=".7"/>
+  <circle cx="96" cy="96" r="3" fill="#c9a96a" opacity=".6"/>
+  <circle cx="180" cy="120" r="3.4" fill="#dbb6ac" opacity=".7"/>
+</svg>
+
+<svg class="floral br" viewBox="0 0 320 300" aria-hidden="true">
+  <g style="color:#a9bca1">
+    <use href="#leaf" transform="translate(196 150) rotate(215) scale(1.15)"/>
+    <use href="#leaf" transform="translate(166 178) rotate(250) scale(1)"/>
+    <use href="#leaf" transform="translate(232 128) rotate(200) scale(.95)"/>
+    <use href="#leaf" transform="translate(150 132) rotate(280) scale(1.05)"/>
+  </g>
+  <g style="color:#b6d2cb"><use href="#leaf" transform="translate(262 178) rotate(160) scale(1.1)"/></g>
+  <use href="#bloom" transform="translate(268 250) scale(1.45) rotate(-14)" style="color:#aed3cc"/>
+  <use href="#bloom" transform="translate(196 200) scale(1.02) rotate(22)" style="color:#e7c7bf"/>
+  <use href="#bloom" transform="translate(290 172) scale(.66) rotate(-26)" style="color:#eed6ce"/>
+  <circle cx="172" cy="228" r="4" fill="#c9a96a" opacity=".7"/>
+  <circle cx="228" cy="206" r="3" fill="#c9a96a" opacity=".6"/>
+  <circle cx="150" cy="180" r="3.4" fill="#dbb6ac" opacity=".7"/>
+</svg>
+
+<div class="veil" aria-hidden="true"></div>
+
+<!-- SCENA 1 -->
+<div class="stage" id="scene1">
+  <div class="card">
+    <h1 class="title">Buon Compleanno</h1>
+    <span class="name" data-name>Gemma</span>
+    <p class="sub">Per te, che credi che i regali più belli siano quelli destinati a diventare ricordi, ho racchiuso in questo regalo un’esperienza da vivere insieme.</p>
+
+    <svg class="sprig" viewBox="0 0 120 34" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 17h104" stroke-linecap="round"/><g fill="currentColor" stroke="none"><ellipse cx="34" cy="10" rx="8" ry="4" transform="rotate(-24 34 10)"/><ellipse cx="52" cy="24" rx="8" ry="4" transform="rotate(24 52 24)"/><ellipse cx="66" cy="10" rx="8" ry="4" transform="rotate(-24 66 10)"/><ellipse cx="84" cy="24" rx="8" ry="4" transform="rotate(24 84 24)"/><circle cx="112" cy="17" r="2.4"/></g></svg>
+
+    <div class="gift" id="gift">
+      <span class="glow"></span><span class="box"></span><span class="rib-v"></span>
+      <span class="lid"></span><span class="lid-rib"></span>
+      <svg class="bow" viewBox="0 0 56 34"><path d="M28 18c-6-14-22-14-22-2 0 8 14 8 22 2zM28 18c6-14 22-14 22-2 0 8-14 8-22 2z" fill="var(--ribbon)"/><circle cx="28" cy="18" r="4.5" fill="var(--lid)" stroke="var(--ribbon)" stroke-width="1.5"/></svg>
+    </div>
+
+    <button class="btn" id="openBtn">Apri regalino</button>
+  </div>
+</div>
+
+<!-- SCENA 2 -->
+<div class="tickets" id="scene2" aria-hidden="true">
+  <div class="t-head">
+    <p class="t-only">Prepara la valigia, si volaaa a…</p>
+  </div>
+  <div id="passWrap" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:16px"></div>
+  <div class="foot">Buon viaggio
+    <svg class="fsprig" viewBox="0 0 120 20" fill="none" stroke="#a9bca1" stroke-width="1.3"><path d="M10 10h100" stroke-linecap="round"/><g fill="#a9bca1" stroke="none"><ellipse cx="40" cy="6" rx="7" ry="3.4" transform="rotate(-22 40 6)"/><ellipse cx="56" cy="14" rx="7" ry="3.4" transform="rotate(22 56 14)"/><ellipse cx="72" cy="6" rx="7" ry="3.4" transform="rotate(-22 72 6)"/><circle cx="110" cy="10" r="2"/></g></svg>
+  </div>
+</div>
+
+<script>
+/* =======================================================
+   ✏️  DATI DEL REGALO
+   ======================================================= */
+const DATI = {
+  nome: "Gemma",
+  compagnia: "Surprise Airlines",
+  volo: "SA 218",
+  gate: "B12",
+  posto: "16A",
+  partenza: { citta:"Bergamo", codice:"BGY" },
+  arrivo:   { citta:"Londra",  codice:"STN" },
+  andata:  { data:"3 DIC 26", dep:"13:20", arr:"14:25" },
+  ritorno: { data:"6 DIC 26", dep:"19:05", arr:"22:00" },
+  // ↓↓↓ nome della passeggera — cambialo qui ↓↓↓
+  passeggero: "Gemma Massetti"
+};
+/* ======================================================= */
+
+document.querySelectorAll('[data-name]').forEach(n=>n.textContent=DATI.nome);
+document.title = "Buon compleanno " + DATI.nome;
+
+const LEGS = [
+  { tipo:"Andata",  from:DATI.partenza, to:DATI.arrivo,   ...DATI.andata },
+  { tipo:"Ritorno", from:DATI.arrivo,   to:DATI.partenza, ...DATI.ritorno }
+];
+function buildPass(leg){
+  return `
+  <div class="pass">
+    <div class="main">
+      <div class="toprow">
+        <div class="airline"><span class="plane">✈</span>${DATI.compagnia}</div>
+        <div class="kind">Carta d'imbarco</div>
+      </div>
+      <span class="p-tag">${leg.tipo}</span>
+      <div class="route">
+        <div class="leg"><div class="code">${leg.from.codice}</div><div class="city">${leg.from.citta}</div></div>
+        <div class="path"><span class="line"></span><span class="plane-ico">✈</span></div>
+        <div class="leg arr"><div class="code dest" data-code="${leg.to.codice}">•••</div><div class="city">${leg.to.citta}</div></div>
+      </div>
+      <div class="fields">
+        <div class="f wide"><div class="lbl">Passeggero</div><div class="val big">${DATI.passeggero}</div></div>
+        <div class="f"><div class="lbl">Data</div><div class="val">${leg.data}</div></div>
+        <div class="f"><div class="lbl">Partenza</div><div class="val">${leg.dep}</div></div>
+        <div class="f"><div class="lbl">Arrivo</div><div class="val">${leg.arr}</div></div>
+        <div class="f"><div class="lbl">Volo</div><div class="val">${DATI.volo}</div></div>
+        <div class="f"><div class="lbl">Gate</div><div class="val">${DATI.gate}</div></div>
+        <div class="f"><div class="lbl">Posto</div><div class="val">${DATI.posto}</div></div>
+      </div>
+    </div>
+    <div class="stub">
+      <div class="s-code">${leg.from.codice}→${leg.to.codice}</div>
+      <div class="barcode"></div>
+      <div class="seat">${DATI.posto}</div>
+    </div>
+  </div>`;
+}
+document.getElementById('passWrap').innerHTML = LEGS.map(buildPass).join('');
+
+/* effetto tabellone sulla destinazione */
+const GLYPHS="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+function flipTo(el,target){
+  const len=target.length;let ticks=0;const total=38;
+  const id=setInterval(()=>{ticks++;
+    if(ticks>=total){clearInterval(id);el.textContent=target;
+      const city=el.closest('.leg')?.querySelector('.city');if(city)city.classList.add('show');
+      return;}
+    let out="";for(let i=0;i<len;i++){out+=GLYPHS[Math.floor(Math.random()*GLYPHS.length)];}
+    el.textContent=out;},66);
+}
+
+/* coriandoli */
+const c=document.getElementById('confetti'),ctx=c.getContext('2d');
+function resize(){c.width=innerWidth;c.height=innerHeight}resize();addEventListener('resize',resize);
+function burst(){
+  const cols=['#a8d0cb','#c3d0be','#e7c7bf','#dfe6da','#c9a96a','#f4efe6'];
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const N=reduce?32:90,P=[];
+  for(let i=0;i<N;i++)P.push({x:innerWidth/2+(Math.random()-.5)*80,y:innerHeight*.45,
+    vx:(Math.random()-.5)*10,vy:-5-Math.random()*11,s:5+Math.random()*6,r:Math.random()*6,vr:(Math.random()-.5)*.3,
+    col:cols[i%cols.length],life:1});
+  let t0=null;(function f(ts){if(!t0)t0=ts;const dt=(ts-t0)/1000;ctx.clearRect(0,0,c.width,c.height);let alive=false;
+    P.forEach(p=>{p.vy+=.26;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.vx*=.99;if(dt>1.4)p.life-=.02;
+      if(p.life>0&&p.y<c.height+40){alive=true;ctx.save();ctx.globalAlpha=Math.max(0,p.life);ctx.translate(p.x,p.y);ctx.rotate(p.r);
+        ctx.fillStyle=p.col;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);ctx.restore();}});
+    if(alive)requestAnimationFrame(f);else ctx.clearRect(0,0,c.width,c.height);})(performance.now());
+}
+
+/* apertura */
+let opened=false;
+function openGift(){
+  if(opened)return;opened=true;
+  const s1=document.getElementById('scene1');
+  s1.classList.add('opening');
+  burst();
+  if(navigator.vibrate)navigator.vibrate([12,40,18]);
+  setTimeout(()=>{s1.style.transition='opacity .5s,transform .5s';s1.style.opacity='0';s1.style.transform='translateY(-12px) scale(.97)';s1.style.pointerEvents='none';},640);
+  setTimeout(()=>{
+    s1.style.display='none';
+    const s2=document.getElementById('scene2');
+    s2.classList.add('show');s2.setAttribute('aria-hidden','false');
+    window.scrollTo({top:0});
+    const passes=[...document.querySelectorAll('.pass')];
+    const reveal=(i)=>{const p=passes[i];if(!p)return;
+      if(i===0){
+        p.classList.add('in');
+        const d=p.querySelector('.code.dest');
+        setTimeout(()=>{if(d)flipTo(d,d.dataset.code);},650);
+      }else{
+        p.classList.add('static');
+        const d=p.querySelector('.code.dest');
+        if(d){d.textContent=d.dataset.code;const c=d.closest('.leg')?.querySelector('.city');if(c)c.classList.add('show');}
+      }};
+    setTimeout(()=>reveal(0),300);   // 1° biglietto: andata (con tabellone)
+    setTimeout(()=>reveal(1),4150);  // 2° biglietto: ritorno (senza animazione)
+  },1140);
+}
+document.getElementById('openBtn').addEventListener('click',openGift);
+document.getElementById('gift').addEventListener('click',openGift);
+</script>
+</body>
+</html>
